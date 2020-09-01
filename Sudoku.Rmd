@@ -1,0 +1,218 @@
+---
+title: "Comparison of Simulated Annealing and Backtracking For Sudoku"
+author: "Chao XIA"
+date: "05/03/2019"
+output:
+  slidy_presentation: default
+  ioslides_presentation: default
+---
+
+## Comparison of Simulated Annealing and Backtracking For Sudoku
+
+```{r, echo = F, out.width="50%"}
+setwd("D:/study/MasterinUSC/pm520/final project/soduku")
+knitr::include_graphics("Sudoku.jpg")
+```
+
+## The Most Direct Thought: Backtracking
+
+1. Calculate candidates for each blank
+
+2. Fill the first blank with its first candidate
+
+3. Fill the next blank with its first candidate
+
+    3a. if the conflict equals to 0, then move to next blank
+    
+    3b. if the conflict does not equal to 0, then move to previous blank and fill this blank with its next         candidate
+
+4. Repeat procedure 3 until there is no conflict for any of the blank in the 9 * 9 grid
+
+## The Most Direct Thought: Backtracking
+
+### Advantage
+
+1. Easy to get the idea
+
+### Disadvantage
+
+1. May be more complex if less grid is filled
+
+2. May not be easy to realize
+
+## Simulated Annealing
+
+```{r, echo = F, out.width="30%"}
+knitr::include_graphics("Annealing.jpg")
+```
+
+1. Generate the initial solution
+
+2. Calculate the total conflicts of the initial solution $E$
+
+3. Set the initial temperature $T_{initial}$, the temperature decrease rate $r$  and the final temperature $T_{final}$
+
+4. Generate new candidate solution
+
+## Simulated Annealing
+
+```{r, echo = F, out.width="30%"}
+knitr::include_graphics("Annealing.jpg")
+```
+
+5. Calculate the conflicts of the new candidate solution $E'$
+
+6. Accpet the new candiate solution with probability of min{1, $e^{-\frac{\delta E}{T}}$}
+
+7. Decrease the temperature with rate $r$
+
+8. Continue the loop until temperature is less or equal to final temperature $T_{final}$
+
+## Test Backtracking Method and Simulated Annealing Method
+
+### Simple
+
+```{r, echo = F, out.width="30%"}
+knitr::include_graphics("D:/study/MasterinUSC/pm520/final project/soduku/simple.png")
+```
+
+## Test Backtracking Method and Simulated Annealing Method
+
+### Simple Sudoku: Backtracking
+
+```{r, echo = F, out.width="30%"}
+knitr::include_graphics("D:/study/MasterinUSC/pm520/final project/soduku/Sudoku_simple/Sudoku_simple-BT.gif")
+```
+
+## Test Backtracking Method and Simulated Annealing Method
+
+### Simple Sudoku: Simulated Annealing
+
+```{r, echo = F, out.width="20%"}
+knitr::include_graphics("D:/study/MasterinUSC/pm520/final project/soduku/Sudoku_simple/testsudoku1.gif")
+knitr::include_graphics("D:/study/MasterinUSC/pm520/final project/soduku/Sudoku_simple/testsudoku2.gif")
+knitr::include_graphics("D:/study/MasterinUSC/pm520/final project/soduku/Sudoku_simple/testsudoku3.gif")
+knitr::include_graphics("D:/study/MasterinUSC/pm520/final project/soduku/Sudoku_simple/testsudoku4.gif")
+knitr::include_graphics("D:/study/MasterinUSC/pm520/final project/soduku/Sudoku_simple/testsudoku5.gif")
+knitr::include_graphics("D:/study/MasterinUSC/pm520/final project/soduku/Sudoku_simple/testsudoku6.gif")
+knitr::include_graphics("D:/study/MasterinUSC/pm520/final project/soduku/Sudoku_simple/testsudoku7.gif")
+knitr::include_graphics("D:/study/MasterinUSC/pm520/final project/soduku/Sudoku_simple/testsudoku8.gif")
+knitr::include_graphics("D:/study/MasterinUSC/pm520/final project/soduku/Sudoku_simple/testsudoku9.gif")
+knitr::include_graphics("D:/study/MasterinUSC/pm520/final project/soduku/Sudoku_simple/testsudoku10.gif")
+```
+
+## Test Backtracking Method and Simulated Annealing Method
+
+### Simple Sudoku: Simulated Annealing
+
+```{r, echo = F, out.width="20%"}
+knitr::include_graphics("D:/study/MasterinUSC/pm520/final project/soduku/Sudoku_simple/convergence1.png")
+knitr::include_graphics("D:/study/MasterinUSC/pm520/final project/soduku/Sudoku_simple/convergence2.png")
+knitr::include_graphics("D:/study/MasterinUSC/pm520/final project/soduku/Sudoku_simple/convergence3.png")
+knitr::include_graphics("D:/study/MasterinUSC/pm520/final project/soduku/Sudoku_simple/convergence4.png")
+knitr::include_graphics("D:/study/MasterinUSC/pm520/final project/soduku/Sudoku_simple/convergence5.png")
+knitr::include_graphics("D:/study/MasterinUSC/pm520/final project/soduku/Sudoku_simple/convergence6.png")
+knitr::include_graphics("D:/study/MasterinUSC/pm520/final project/soduku/Sudoku_simple/convergence7.png")
+knitr::include_graphics("D:/study/MasterinUSC/pm520/final project/soduku/Sudoku_simple/convergence8.png")
+knitr::include_graphics("D:/study/MasterinUSC/pm520/final project/soduku/Sudoku_simple/convergence9.png")
+knitr::include_graphics("D:/study/MasterinUSC/pm520/final project/soduku/Sudoku_simple/convergence10.png")
+```
+
+## Test Backtracking Method and Simulated Annealing Method
+
+### Simple Sudoku: Comparsion
+
+```{r, echo = F, out.width="30%"}
+knitr::include_graphics("D:/study/MasterinUSC/pm520/final project/soduku/Sudoku_simple/Sudoku_simple-BT.gif")
+knitr::include_graphics("D:/study/MasterinUSC/pm520/final project/soduku/Sudoku_simple/testSudoku.png")
+```
+
+## Test Backtracking Method and Simulated Annealing Method
+
+### Medium
+
+```{r, echo = F, out.width="30%"}
+knitr::include_graphics("D:/study/MasterinUSC/pm520/final project/soduku/test.png")
+```
+
+## Test Backtracking Method and Simulated Annealing Method
+
+### Medium Sudoku: Backtracking
+
+```{r, echo = F, out.width="50%"}
+knitr::include_graphics("D:/study/MasterinUSC/pm520/final project/soduku/testSudoku/testsudoku-BT.gif")
+```
+
+## Test Backtracking Method and Simulated Annealing Method
+
+### Medium Sudoku: Simulated Annealing
+
+```{r, echo = F, out.width="20%"}
+knitr::include_graphics("D:/study/MasterinUSC/pm520/final project/soduku/testSudoku/testsudoku1.gif")
+knitr::include_graphics("D:/study/MasterinUSC/pm520/final project/soduku/testSudoku/testsudoku2.gif")
+knitr::include_graphics("D:/study/MasterinUSC/pm520/final project/soduku/testSudoku/testsudoku3.gif")
+knitr::include_graphics("D:/study/MasterinUSC/pm520/final project/soduku/testSudoku/testsudoku4.gif")
+knitr::include_graphics("D:/study/MasterinUSC/pm520/final project/soduku/testSudoku/testsudoku5.gif")
+knitr::include_graphics("D:/study/MasterinUSC/pm520/final project/soduku/testSudoku/testsudoku6.gif")
+knitr::include_graphics("D:/study/MasterinUSC/pm520/final project/soduku/testSudoku/testsudoku7.gif")
+knitr::include_graphics("D:/study/MasterinUSC/pm520/final project/soduku/testSudoku/testsudoku8.gif")
+knitr::include_graphics("D:/study/MasterinUSC/pm520/final project/soduku/testSudoku/testsudoku9.gif")
+knitr::include_graphics("D:/study/MasterinUSC/pm520/final project/soduku/testSudoku/testsudoku10.gif")
+```
+
+## Test Backtracking Method and Simulated Annealing Method
+
+### Medium Sudoku: Simulated Annealing
+
+```{r, echo = F, out.width="20%"}
+knitr::include_graphics("D:/study/MasterinUSC/pm520/final project/soduku/testSudoku/convergence1.png")
+knitr::include_graphics("D:/study/MasterinUSC/pm520/final project/soduku/testSudoku/convergence2.png")
+knitr::include_graphics("D:/study/MasterinUSC/pm520/final project/soduku/testSudoku/convergence3.png")
+knitr::include_graphics("D:/study/MasterinUSC/pm520/final project/soduku/testSudoku/convergence4.png")
+knitr::include_graphics("D:/study/MasterinUSC/pm520/final project/soduku/testSudoku/convergence5.png")
+knitr::include_graphics("D:/study/MasterinUSC/pm520/final project/soduku/testSudoku/convergence6.png")
+knitr::include_graphics("D:/study/MasterinUSC/pm520/final project/soduku/testSudoku/convergence7.png")
+knitr::include_graphics("D:/study/MasterinUSC/pm520/final project/soduku/testSudoku/convergence8.png")
+knitr::include_graphics("D:/study/MasterinUSC/pm520/final project/soduku/testSudoku/convergence9.png")
+knitr::include_graphics("D:/study/MasterinUSC/pm520/final project/soduku/testSudoku/convergence10.png")
+```
+
+## Test Backtracking Method and Simulated Annealing Method
+
+### Medium Sudoku: Comparsion
+
+```{r, echo = F, out.width="30%"}
+knitr::include_graphics("D:/study/MasterinUSC/pm520/final project/soduku/testSudoku/testsudoku-BT.gif")
+knitr::include_graphics("D:/study/MasterinUSC/pm520/final project/soduku/testSudoku/testSudoku.png")
+```
+
+## Test Backtracking Method and Simulated Annealing Method
+
+### Hard Sudoku: A big challenge!
+
+```{r, echo = F, out.width="30%"}
+knitr::include_graphics("D:/study/MasterinUSC/pm520/final project/soduku/hard.png")
+```
+
+## Test Backtracking Method and Simulated Annealing Method
+
+### Hard Sudoku: A big challenge!
+
+```{r, echo = F, out.width="50%"}
+knitr::include_graphics("D:/study/MasterinUSC/pm520/final project/soduku/Sudoku.hard/Sudoku_hard-BT.gif")
+```
+
+## Test Backtracking Method and Simulated Annealing Method
+
+### Hard Sudoku: A big challenge!
+
+```{r, echo = F, out.width="50%"}
+knitr::include_graphics("D:/study/MasterinUSC/pm520/final project/soduku/Sudoku.hard/testSudoku1.gif")
+knitr::include_graphics("D:/study/MasterinUSC/pm520/final project/soduku/Sudoku.hard/convergence1.png")
+```
+
+## Conclusion
+
+When Sudoku is simple, backtracking will be a good method.
+
+But the more complex the Sudoku is, the more powerful of Simulated annealing than Backtracking.

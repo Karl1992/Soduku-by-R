@@ -1,0 +1,437 @@
+---
+title: "Supporting Code"
+author: "Chao XIA"
+date: "05/06/2019"
+output: pdf_document
+---
+
+```{r}
+# read data
+library("tcltk")
+library("tkrplot")
+library("Matrix")
+
+z<-mat.or.vec(9,9)
+setwd("D:/study/MasterinUSC/pm520/final project/soduku")
+MyZ<-read.table(file.choose())
+MyZ<-matrix(unlist(MyZ), ncol = 9, byrow = TRUE)
+```
+
+```{r}
+# plot function
+## Simple plot
+SudokuPlot <- function(z) {
+  cols <- ifelse(z, "blue","black")
+  par(mar=c(1,1,1,1), bg="white")
+  plot(0.5:9.5, 0.5:9.5, type="n", axes=FALSE, xlab="", ylab="")
+  cusr <<- par("usr"); cplt <<- par("plt")
+  segments(0.5:9.5, rep(0.5,10), 0.5:9.5, rep(9.5,10), col="grey")
+  segments(rep(0.5,10), 0.5:9.5, rep(9.5,10), 0.5:9.5, col="grey")
+  segments(c(0,3,6,9)+0.5, rep(0.5,4), c(0,3,6,9)+0.5, rep(9.5,4), lwd=3)
+  segments(rep(0.5,4), c(0,3,6,9)+0.5, rep(9.5,4), c(0,3,6,9)+0.5, lwd=3)
+  for (i in 1:9) for (j in 1:9) if (z[i,j]) {
+    if (cols[i,j]=="red") text(j, 10-i, "X", col="pink", cex=3)
+    text(j, 10-i, z[i,j], col=cols[i,j], font=ifelse(cols[i,j]=="blue",2,1),
+         cex=ifelse(cols[i,j]=="blue", 2.0, 1.8))
+  }
+}
+
+##plot for SA
+
+SudokuPlot2 <- function(z, Newallmistake) {
+  cols <- ifelse(z, "blue","black")
+  par(mar=c(1,1,1,1), bg="white")
+  plot(0.5:9.5, 0.5:9.5, type="n", axes=FALSE, xlab="", ylab="", main = paste("conflicts =", Newallmistake))
+  cusr <<- par("usr"); cplt <<- par("plt")
+  segments(0.5:9.5, rep(0.5,10), 0.5:9.5, rep(9.5,10), col="grey")
+  segments(rep(0.5,10), 0.5:9.5, rep(9.5,10), 0.5:9.5, col="grey")
+  segments(c(0,3,6,9)+0.5, rep(0.5,4), c(0,3,6,9)+0.5, rep(9.5,4), lwd=3)
+  segments(rep(0.5,4), c(0,3,6,9)+0.5, rep(9.5,4), c(0,3,6,9)+0.5, lwd=3)
+  for (i in 1:9) for (j in 1:9) if (z[i,j]) {
+    if (cols[i,j]=="red") text(j, 10-i, "X", col="pink", cex=3)
+    text(j, 10-i, z[i,j], col=cols[i,j], font=ifelse(cols[i,j]=="blue",2,1),
+         cex=ifelse(cols[i,j]=="blue", 2.0, 1.8))
+  }
+}
+
+## plot for BT
+
+SudokuPlot3 <- function(z, iter, thistime) {
+  cols <- ifelse(z, "blue","black")
+  par(mar=c(3,3,3,3), bg="white")
+  plot(0.5:9.5, 0.5:9.5, type="n", axes=FALSE, xlab="", ylab="", main = c(paste("Iterations =", iter), paste(thistime, "s")))
+  cusr <<- par("usr"); cplt <<- par("plt")
+  segments(0.5:9.5, rep(0.5,10), 0.5:9.5, rep(9.5,10), col="grey")
+  segments(rep(0.5,10), 0.5:9.5, rep(9.5,10), 0.5:9.5, col="grey")
+  segments(c(0,3,6,9)+0.5, rep(0.5,4), c(0,3,6,9)+0.5, rep(9.5,4), lwd=3)
+  segments(rep(0.5,4), c(0,3,6,9)+0.5, rep(9.5,4), c(0,3,6,9)+0.5, lwd=3)
+  for (i in 1:9) for (j in 1:9) if (z[i,j]) {
+    if (cols[i,j]=="red") text(j, 10-i, "X", col="pink", cex=3)
+    text(j, 10-i, z[i,j], col=cols[i,j], font=ifelse(cols[i,j]=="blue",2,1),
+         cex=ifelse(cols[i,j]=="blue", 2.0, 1.8))
+  }
+}
+```
+
+```{r}
+#conflicts counting function
+# Backtracking
+countmistake <- function(Solution,x,y){
+  
+  count <- 0
+  
+  if(x %% 3 == 0){
+    rlimit <- x
+  }else{
+    if(x %% 3 == 1){
+      rlimit <- x + 2
+    }else{
+      rlimit <- x + 1
+    }
+  }
+  
+  if(y %% 3 == 0){
+    climit <- y
+  }else{
+    if(y %% 3 == 1){
+      climit <- y + 2
+    }else{
+      climit <- y + 1
+    }
+  }
+  
+  for(k in (rlimit - 2):rlimit){
+    for(l in (climit - 2):climit){
+      if(Solution[x,y] == Solution[k,l]){
+        count <- count + 1
+      }
+    }
+  }
+  
+
+  for(l in 1:9){
+    count <- count + as.numeric(Solution[x,l] == Solution[x,y])
+  }
+  
+  for(k in 1:9){
+    count <- count + as.numeric(Solution[k,y] == Solution[x,y])
+  }
+  
+  count <- count - 3
+  
+  return(count)
+}
+
+# SA
+countmistake <- function(M){
+  count <- 0
+  for(i in 1:9){
+    row_r <- table(M[i,])
+    count <- count + sum(row_r - 1)
+  }
+  for(j in 1:9){
+    col_r <- table(M[,j])
+    count <- count + sum(col_r - 1)
+  }
+  return(count)
+}
+```
+
+```{r}
+# frame to gif
+frames2gif <- function(pathIn='',
+                       pathOut='',
+                       ImageMagick_path='',
+                       resize_ratio=1,
+                       delay=40,
+                       frameFormat='png',
+                       everyFrame=1){
+  
+    tempdir <- paste0(pathIn, '/temp')
+  dir.create(tempdir)
+  
+  files <- list.files(pathIn, pattern=paste0('*.', frameFormat), recursive=FALSE, full.names=TRUE)
+  index <- seq(1, length(files), by=everyFrame)
+  file.copy(files[index], tempdir)
+  
+  command <- paste(ImageMagick_path,
+                   '-resize', paste0(as.integer(100L*resize_ratio), '%'),
+                   '-delay', delay, '-loop 1', 
+                   paste0(tempdir,'/*.', frameFormat),
+                   pathOut)
+  #system('F:R_tutorials/gif/ImageMagick-7.0.8-64bit/convert -resize 90% -delay 40 *.png result.gif')
+  system(command)
+  
+  ## delete temp dir
+  unlink(tempdir, recursive=TRUE, force=TRUE)
+}
+```
+
+```{r}
+# Backtracking
+BT.soduku <- function(MyZ){
+  Solution <- MyZ
+  
+  Blankindex <- mat.or.vec(0,2)
+  
+  candidate <- list()
+  
+  for (i in 1:9){
+    for (j in 1:9){
+      if (Solution[i,j] == 0){
+        Blankindex <- rbind(Blankindex, c(i,j))
+        can <- c(1:9)
+        if(i %% 3 == 0){
+          rlimit <- i
+        }else{
+          if(i %% 3 == 1){
+            rlimit <- i + 2
+          }else{
+            rlimit <- i + 1
+          }
+        }
+        
+        if(j %% 3 == 0){
+          climit <- j
+        }else{
+          if(j %% 3 == 1){
+            climit <- j + 2
+          }else{
+            climit <- j + 1
+          }
+        }
+        
+        for(k in (rlimit - 2):rlimit){
+          for(l in (climit - 2):climit){
+            if(Solution[k,l] %in% can){
+              can <- can[-which(can == Solution[k,l])]
+            }
+          }
+        }
+        
+        for (k in 1:9){
+          if (Solution[k,j] %in% can){
+            can <- can[-which(can == Solution[k,j])]
+          }
+        }
+        
+        for (l in 1:9){
+          if (Solution[i,l] %in% can){
+            can <- can[-which(can == Solution[i,l])]
+          }
+        }
+        candidate[[nrow(Blankindex)]] <- can
+      }
+    }
+  }
+  
+  nofB <- nrow(Blankindex)
+  
+  numberofr <- 1
+  
+  iter <- 1
+  
+  Starttime <- as.numeric(Sys.time())
+  
+  while (numberofr <= nofB) {
+    x <- Blankindex[numberofr,1]
+    y <- Blankindex[numberofr,2]
+    
+    if (Solution[x,y] == 0){
+    truecan <- candidate[[numberofr]]
+    }else{
+      if (which(candidate[[numberofr]] == Solution[x,y]) == length(candidate[[numberofr]])){
+        Solution[x,y] <- 0
+        numberofr <- numberofr - 1
+        next
+      }else{
+      truecan <- candidate[[numberofr]][(which(candidate[[numberofr]] == Solution[x,y])+1):length(candidate[[numberofr]])]
+      }
+    }
+    
+    ncan <- length(truecan)
+    
+    index <- 1
+    Solution[x,y] <- truecan[index]
+    while (index <= ncan){
+      if (countmistake(Solution,x,y) == 0){
+        break
+      }else{
+        index <- index + 1
+        Solution[x,y] <- truecan[index]
+      }
+    }
+      
+    if (index == ncan + 1){
+      Solution[x,y] <- 0
+      numberofr <- numberofr - 1
+      x <- Blankindex[numberofr,1]
+      y <- Blankindex[numberofr,2]
+    }else{
+      numberofr <- numberofr + 1
+    }
+    
+    thistime <- round(as.numeric(Sys.time()) - Starttime, 2)
+    png(filename = paste0("./1/gif", formatC(iter, 9), ".png"))
+    SudokuPlot3(Solution, iter, thistime)
+    dev.off()
+    iter <- iter + 1
+  }
+}
+```
+
+```{r}
+# Newsolution generator
+
+GenerateNewS <- function(M,B){
+  for (i in 1:3) {
+    for (j in 1:3){
+      exchange <- numeric()
+      for (k in (i*3-2):(i*3)){
+        for (l in (j*3-2):(j*3)){
+          if (B[k,l] == 1){
+            exchange <- rbind(exchange, c(k,l))
+          }
+        }
+      }
+      excandidate <- numeric()
+      canindex <- numeric()
+
+      for (m in 1:nrow(exchange)){
+        indivialmistake <- 0
+        indivialmistake <- indivialmistake + length(which(M[exchange[m,][1],] == M[exchange[m,][1],exchange[m,][2]])) - 1 + length(which(M[,exchange[m,][2]] == M[exchange[m,][1],exchange[m,][2]])) - 1
+        if (indivialmistake > 0){
+          excandidate <- rbind(excandidate, exchange[m,])
+          canindex <- c(canindex, m)
+        }
+      }
+      
+      if (length(excandidate) != 0){
+        if (nrow(excandidate) > 2){
+          nrow_e <- nrow(excandidate)
+          change <- sample(nrow_e, 2)
+          inter <- M[excandidate[change[1],][1], excandidate[change[1],][2]]
+          M[excandidate[change[1],][1], excandidate[change[1],][2]] <- M[excandidate[change[2],][1], excandidate[change[2],][2]]
+          M[excandidate[change[2],][1], excandidate[change[2],][2]] <- inter
+        }else{
+          if (nrow(excandidate) == 2){
+            nrow_e <- nrow(excandidate)
+            change <- sample(nrow_e, 2, replace = T)
+            inter <- M[excandidate[change[1],][1], excandidate[change[1],][2]]
+            M[excandidate[change[1],][1], excandidate[change[1],][2]] <- M[excandidate[change[2],][1], excandidate[change[2],][2]]
+            M[excandidate[change[2],][1], excandidate[change[2],][2]] <- inter 
+          }else{
+            nrow_e <- nrow(exchange)
+            change <- sample(c(1:nrow_e)[-canindex], 1)
+            inter <- M[exchange[change,][1], exchange[change,][2]]
+            M[exchange[change,][1], exchange[change,][2]] <- M[excandidate[1], excandidate[2]]
+            M[excandidate[1], excandidate[2]] <- inter
+          }
+        }
+      # }else{
+      #   nrow_e <- nrow(exchange)
+      #   change <- sample(nrow_e, 2)
+      #   inter <- M[exchange[change[1],][1], exchange[change[1],][2]]
+      #   M[exchange[change[1],][1], exchange[change[1],][2]] <- M[exchange[change[2],][1], exchange[change[2],][2]]
+      #   M[exchange[change[2],][1], exchange[change[2],][2]] <- inter
+      }
+
+    }
+  }
+  return(M)
+}
+```
+
+```{r}
+# SA
+SA.soduku <- function(Starting.Temp, Tempdecreaserate, Final.Temp, countmistake, GenerateNewS, MyZ, SudokuPlot, reptime){
+  
+  dir.create(paste0("./", reptime))
+  Temp <- Starting.Temp
+  
+  Solution <- MyZ
+  
+  Blank <- mat.or.vec(9,9)
+  
+  for(i in 1:9){
+    for(j in 1:9){
+      if(Solution[i,j] == 0){
+        Blank[i,j] = 1
+      }
+    }
+  }
+  
+  for (i in 1:3) {
+    for (j in 1:3){
+      standard <- c(1:9)
+      Exist <- numeric()
+      for (k in (i*3-2):(i*3)){
+        for (l in (j*3-2):(j*3)){
+          if (Blank[k,l] != 1) {
+            Exist <- c(Exist, which(standard == Solution[k,l]))
+          }
+        }
+      }
+      candidate <- standard[-Exist]
+      for (k in (i*3-2):(i*3)){
+        for (l in (j*3-2):(j*3)){
+          if (Blank[k,l] == 1) {
+            if (length(candidate) != 1){
+              Solution[k,l] <- sample(candidate,1)
+              candidate <- candidate[-which(candidate == Solution[k,l])]
+            }else{
+              Solution[k,l] <- candidate
+            }
+          }
+        }
+      }
+      
+    }
+  }
+  
+  allmistake <- countmistake(Solution)
+  
+  iter <- 1
+  
+  mistakerec <- allmistake
+  
+  while (Temp > Final.Temp){
+    
+      if(allmistake == 0){
+        break
+      }
+      
+      Newsolution <- GenerateNewS(Solution, Blank)
+      
+      Newallmistake <- countmistake(Newsolution)
+      
+      p <- runif(1)
+      
+      h <- min(1, exp(-1*(Newallmistake-allmistake)/Temp)) #* q)
+      
+      if(p < h){
+        Solution <- Newsolution
+        allmistake <- Newallmistake
+        png(filename = paste0("./", reptime, "/gif", formatC(iter, 5), ".png"))
+        SudokuPlot2(Solution, Newallmistake)
+        dev.off()
+        
+        mistakerec <-c(mistakerec, Newallmistake)
+        
+        iter <- iter + 1
+      }
+      
+      Temp <- Temp*(1 - Tempdecreaserate)
+    # N_I <- N_I + 1
+    # }
+    # 
+    # N_O <- N_O + 1
+    # 
+    # q <- q*0.8
+  }
+    
+  SudokuPlot2(Solution, Newallmistake)
+  
+  return(mistakerec)
+}
+```
